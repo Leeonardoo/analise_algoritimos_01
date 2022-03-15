@@ -68,16 +68,17 @@ public class Main {
         boolean isConvex = true;
 
         //Usando -2 por causa de ArrayOutOfBounds
-        if (ccw(points[0], points[1], points[2]) >= 0) {
+        //Qualquer curva com orientação diferente da primeira significa que o polígono é não convexo(?)
+        if (!ccw(points[0], points[1], points[2])) {
             for (int i = 0; i < corners - 2; i++) {
-                if (ccw(points[i], points[i + 1], points[i + 2]) < 0) {
+                if (ccw(points[i], points[i + 1], points[i + 2])) {
                     isConvex = false;
                     break;
                 }
             }
         } else {
             for (int i = 0; i < corners - 2; i++) {
-                if (ccw(points[i], points[i + 1], points[i + 2]) > 0) {
+                if (!ccw(points[i], points[i + 1], points[i + 2])) {
                     isConvex = false;
                     break;
                 }
@@ -91,8 +92,10 @@ public class Main {
         }
     }
 
-    public static int ccw(Point p1, Point p2, Point p3) {
-        return (p2.getX() - p1.getX()) * (p3.getY() - p1.getY()) -
+    public static boolean ccw(Point p1, Point p2, Point p3) {
+        double value = (p2.getX() - p1.getX()) * (p3.getY() - p1.getY()) -
                 (p2.getY() - p1.getY()) * (p3.getX() - p1.getX());
+
+        return value < 0.000001;
     }
 }
