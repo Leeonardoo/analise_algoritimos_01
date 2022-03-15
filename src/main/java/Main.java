@@ -1,43 +1,13 @@
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 public class Main {
 
     public static void main(String[] args) {
-
-        int[][] pointCoords = new int[][]{
-                {3, 9},
-                {5, 2},
-                {-1, -4},
-                {8, 3},
-                {-6, 90},
-                {23, 3},
-                {4, -11}
-        };
-
-        Point[] points = new Point[pointCoords.length];
-
-        for (int i = 0; i < pointCoords.length; i++) {
-            points[i] = new Point(pointCoords[i][0], pointCoords[i][1]);
-        }
-
-        // find the convex hull
-        List<Point> convexHull = grahamScan(points);
-
-        for (Point p : convexHull) {
-            System.out.println(p);
-        }
-
-
-       /* galeria1();
-
-        System.out.println("---");
-
-        galeria2();*/
+        galeria1();
+        galeria2();
+        galeria3();
+        galeria4();
     }
 
-    /*private static void galeria1() {
+    private static void galeria1() {
         int corners = 4;
         int[][] coords = new int[][]{
                 {0, 0},
@@ -46,7 +16,7 @@ public class Main {
                 {0, 3}
         };
 
-        containsCriticalPoint(corners, coords);
+        containsCriticalPoint(corners, coords); //No
     }
 
     private static void galeria2() {
@@ -58,51 +28,71 @@ public class Main {
                 {0, 3}
         };
 
-        containsCriticalPoint(corners, coords);
-    }*/
-
-
-    public static List<Point> grahamScan(Point[] points) {
-        Arrays.sort(points, Comparator.comparing(Point::getX));
-        ArrayList<Point> lSup = new ArrayList<>();
-
-        lSup.add(points[0]);
-        lSup.add(points[1]);
-
-        for (int i = 2; i < points.length; i++) {
-            do {
-                lSup.add(points[i]);
-            } while (lSup.size() > 2 && !ccw(lSup.get(lSup.size() - 3), lSup.get(lSup.size() - 2), lSup.get(lSup.size() - 1)));
-
-            lSup.remove(lSup.size() - 2);
-
-        }
-
-        ArrayList<Point> lInf = new ArrayList<>();
-        lInf.add(points[points.length - 1]);
-        lInf.add(points[points.length - 2]);
-
-        for (int i = points.length - 3; i >= 0; i--) {
-            do {
-                lInf.add(points[i]);
-            } while (lInf.size() > 2 && !ccw(lInf.get(lInf.size() - 3), lInf.get(lInf.size() - 2), lInf.get(lInf.size() - 1)));
-
-            lInf.remove(lInf.size() - 2);
-        }
-
-        lSup.remove(0);
-        lSup.remove(lSup.size() - 1);
-
-        lInf.remove(0);
-        lInf.remove(lInf.size() - 1);
-
-        return Stream.concat(lSup.stream(), lInf.stream()).collect(Collectors.toList());
+        containsCriticalPoint(corners, coords); //Yes
     }
 
-    public static boolean ccw(Point p1, Point p2, Point p3) {
-        double value = (p2.getX() - p1.getX()) * (p3.getY() - p1.getY()) -
-                (p2.getY() - p1.getY()) * (p3.getX() - p1.getX());
+    private static void galeria3() {
+        int corners = 5;
+        int[][] coords = new int[][]{
+                {0, 0},
+                {100, 0},
+                {50, 100},
+                {30, 30},
+                {50, 90}
+        };
 
-        return value < 0.000001;
+        containsCriticalPoint(corners, coords); //No
+    }
+
+    private static void galeria4() {
+        int corners = 6;
+        int[][] coords = new int[][]{
+                {0, 0},
+                {0, 10},
+                {30, 10},
+                {30, 0},
+                {0, 30},
+                {30, 30}
+        };
+
+        containsCriticalPoint(corners, coords); //No
+    }
+
+    public static void containsCriticalPoint(int corners, int[][] coords) {
+        Point[] points = new Point[corners];
+
+        for (int i = 0; i < corners; i++) {
+            points[i] = new Point(coords[i][0], coords[i][1]);
+        }
+
+        boolean isConvex = true;
+
+        //Usando -2 por causa de ArrayOutOfBounds
+        if (ccw(points[0], points[1], points[2]) >= 0) {
+            for (int i = 0; i < corners - 2; i++) {
+                if (ccw(points[i], points[i + 1], points[i + 2]) < 0) {
+                    isConvex = false;
+                    break;
+                }
+            }
+        } else {
+            for (int i = 0; i < corners - 2; i++) {
+                if (ccw(points[i], points[i + 1], points[i + 2]) > 0) {
+                    isConvex = false;
+                    break;
+                }
+            }
+        }
+
+        if (!isConvex) {
+            System.out.println("Yes");
+        } else {
+            System.out.println("No");
+        }
+    }
+
+    public static int ccw(Point p1, Point p2, Point p3) {
+        return (p2.getX() - p1.getX()) * (p3.getY() - p1.getY()) -
+                (p2.getY() - p1.getY()) * (p3.getX() - p1.getX());
     }
 }
