@@ -1,3 +1,26 @@
+/**
+ * @author Larson Kremer Vicente
+ * @author Leonardo de Oliveira
+ *
+ * Obs: colando a sequência de número de vértices e os conjuntos de pontos pelo
+ * console já vai dar o resultado pelo console.
+ *
+ * Entrada como no UVA, exemplo:
+ *
+ 4
+ 0 0
+ 3 0
+ 3 3
+ 0 3
+ 4
+ 0 0
+ 3 0
+ 1 1
+ 0 3
+ 0
+ *
+ */
+
 import java.awt.Point;
 import java.util.Scanner;
 
