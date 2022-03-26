@@ -1,101 +1,94 @@
+import java.awt.Point;
+import java.util.Scanner;
+
 public class Main {
 
     public static void main(String[] args) {
-        galeria1();
-        galeria2();
-        galeria3();
-        galeria4();
-    }
+        Scanner scanner = new Scanner(System.in);
 
-    private static void galeria1() {
-        int corners = 4;
-        int[][] coords = new int[][]{
-                {0, 0},
-                {3, 0},
-                {3, 3},
-                {0, 3}
-        };
+        while (true) {
+            int size = scanner.nextInt();
 
-        containsCriticalPoint(corners, coords); //No
-    }
-
-    private static void galeria2() {
-        int corners = 4;
-        int[][] coords = new int[][]{
-                {0, 0},
-                {3, 0},
-                {1, 1},
-                {0, 3}
-        };
-
-        containsCriticalPoint(corners, coords); //Yes
-    }
-
-    private static void galeria3() {
-        int corners = 5;
-        int[][] coords = new int[][]{
-                {0, 0},
-                {100, 0},
-                {50, 100},
-                {30, 30},
-                {50, 90}
-        };
-
-        containsCriticalPoint(corners, coords); //No
-    }
-
-    private static void galeria4() {
-        int corners = 6;
-        int[][] coords = new int[][]{
-                {0, 0},
-                {0, 10},
-                {30, 10},
-                {30, 0},
-                {0, 30},
-                {30, 30}
-        };
-
-        containsCriticalPoint(corners, coords); //No
-    }
-
-    public static void containsCriticalPoint(int corners, int[][] coords) {
-        Point[] points = new Point[corners];
-
-        for (int i = 0; i < corners; i++) {
-            points[i] = new Point(coords[i][0], coords[i][1]);
-        }
-
-        boolean isConvex = true;
-
-        //Usando -2 por causa de ArrayOutOfBounds
-        //Qualquer curva com orientação diferente da primeira significa que o polígono é não convexo(?)
-        if (!ccw(points[0], points[1], points[2])) {
-            for (int i = 0; i < corners - 2; i++) {
-                if (ccw(points[i], points[i + 1], points[i + 2])) {
-                    isConvex = false;
-                    break;
-                }
+            if (size <= 0) {
+                break;
             }
-        } else {
-            for (int i = 0; i < corners - 2; i++) {
-                if (!ccw(points[i], points[i + 1], points[i + 2])) {
-                    isConvex = false;
-                    break;
+
+            Point[] polygon = new Point[size];
+
+            for (int i = 0; i < size; i++) {
+                polygon[i] = new Point(scanner.nextInt(), scanner.nextInt());
+            }
+
+            if (containsCriticalPoint(polygon)) {
+                System.out.println("Yes");
+            } else {
+                System.out.println("No");
+            }
+        }
+    }
+
+    //Qualquer curva diferente da primeira, excluindo 3 pontos colineares,
+    //significa que não é convexo
+    public static boolean containsCriticalPoint(Point[] polygon) {
+        int firstTurn = 0;
+
+        /*
+         * p1 sempre é relacionado a iteração atual
+         * p2 é o próximo ponto se p1 não for o último ponto, do contrário, é o primeiro
+         * p3 é o próximo ponto se p1 não for o último ou penúltimo ponto, do contrário, é o segundo ponto do polígono
+         */
+        for (int i = 0; i < polygon.length; i++) {
+            Point p1, p2, p3;
+
+            p1 = polygon[i];
+            if (i + 1 == polygon.length) {
+                p2 = polygon[0];
+            } else {
+                p2 = polygon[i + 1];
+            }
+
+            if (i + 2 >= polygon.length) {
+                p3 = polygon[1];
+            } else {
+                p3 = polygon[i + 2];
+            }
+
+            int direction = crossProduct(p1, p2, p3);
+
+            if (direction == 0) {
+                continue; //Ignora 3 pontos colineares
+            }
+
+            if (i > 0) {
+                if (direction != firstTurn) {
+                    return true;
                 }
+            } else {
+                firstTurn = direction; //Primeira curva
             }
         }
 
-        if (!isConvex) {
-            System.out.println("Yes");
-        } else {
-            System.out.println("No");
-        }
+        return false;
     }
 
-    public static boolean ccw(Point p1, Point p2, Point p3) {
+    /**
+     * @param p1 p1
+     * @param p2 p2
+     * @param p3 p3
+     * @return 0 -> colinear,
+     * 1 -> esquerda,
+     * -1 -> direita
+     */
+    public static int crossProduct(Point p1, Point p2, Point p3) {
         double value = (p2.getX() - p1.getX()) * (p3.getY() - p1.getY()) -
                 (p2.getY() - p1.getY()) * (p3.getX() - p1.getX());
 
-        return value < 0.000001;
+        if (value < 0) {
+            return -1;
+        } else if (value > 0) {
+            return 1;
+        } else {
+            return 0;
+        }
     }
 }
