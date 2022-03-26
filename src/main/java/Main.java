@@ -34,8 +34,11 @@ public class Main {
 
         /*
          * p1 sempre é relacionado a iteração atual
+         *
          * p2 é o próximo ponto se p1 não for o último ponto, do contrário, é o primeiro
-         * p3 é o próximo ponto se p1 não for o último ou penúltimo ponto, do contrário, é o segundo ponto do polígono
+         *
+         * p3 é o próximo ponto se p1 não for o último ou penúltimo ponto. Se p1 for o penúltimo, então p3 é o primeiro
+         * ponto do polígono. Se p1 for o último, então p3 é o segundo ponto do polígono.
          */
         for (int i = 0; i < polygon.length; i++) {
             Point p1, p2, p3;
@@ -48,7 +51,7 @@ public class Main {
             }
 
             if (i + 2 >= polygon.length) {
-                p3 = polygon[1];
+                p3 = polygon[i + 2 - polygon.length];
             } else {
                 p3 = polygon[i + 2];
             }
